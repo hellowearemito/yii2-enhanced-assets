@@ -1,0 +1,18 @@
+{
+    "name": "mito/yii2-enhanced-assets",
+    "description": "Enhanced assets for Yii2",
+    "type": "yii2-extension",
+    "keywords": ["yii2","extension"],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Nikola Kovacs",
+            "email": "n.kovacs@mito.hu"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "mito\\assets\\": ""
+        }
+    }
+}
