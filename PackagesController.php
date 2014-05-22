@@ -11,19 +11,40 @@ use \Yii;
  */
 class PackagesController extends Controller
 {
-    protected function getPaths()
-    {
-        $config_path = Yii::getAlias('@app/config');
-        $main_config = require($config_path. DIRECTORY_SEPARATOR .'web.php');
+    /**
+     * @var path to main config file
+     */
+    public $configPath;
 
-        $paths = [ Yii::getAlias('@app') ];
+    /**
+     * Loads the config file
+     * @return loaded config
+     */
+    public function loadConfigFile()
+    {
+        if (!isset($this->configPath)) {
+            $configPath = Yii::getAlias('@app/config') . DIRECTORY_SEPARATOR . 'web.php';
+        } else {
+            $configPath = $this->configPath;
+        }
+        return require($configPath);
+    }
+
+    public function getPaths()
+    {
+        $mainConfig = $this->loadConfigFile();
+
+        $paths = [[
+            'path' => Yii::getAlias('@app'),
+            'module' => '_app',
+        ]];
 
 
         /** @todo: module classes are namespaced class names, not path aliases */
-        if (empty($main_config['modules'])) {
+        if (empty($mainConfig['modules'])) {
             return $paths;
         }
-        $modules = $main_config['modules'];
+        $modules = $mainConfig['modules'];
 
         foreach ($modules as $config) {
             // merge submodules
@@ -35,9 +56,16 @@ class PackagesController extends Controller
         foreach ($modules as $name => $config) {
             if (is_array($config)) {
                 if (!empty($config['basePath'])) {
-                    $path = realpath($config['basePath']);
+                    $path = realpath(Yii::getAlias($config['basePath']));
+                    if ($path === false) {
+                        continue;
+                    }
                 } elseif (!empty($config['class'])) {
-                    $class = new \ReflectionClass($config['class']);
+                    try {
+                        $class = new \ReflectionClass($config['class']);
+                    } catch(\ReflectionException $e) {
+                        continue;
+                    }
                     $path = dirname($class->getFileName());
                     if ($path === false) {
                         continue;
@@ -66,16 +94,12 @@ class PackagesController extends Controller
         $paths = $this->getPaths();
 
         $ret = [
-            'jsfiles' => [],
-            'cssfiles' => [],
             'packages' => [],
         ];
 
-        foreach ($paths as $path) {
-            if (is_array($path)) {
-                $module = $path['module'];
-                $path = $path['path'];
-            }
+        foreach ($paths as $pathConfig) {
+            $module = $pathConfig['module'];
+            $path = $pathConfig['path'];
             $bundlesFile = $path . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . 'bundles.php';
             if (!file_exists($bundlesFile)) {
                 continue;
@@ -90,10 +114,11 @@ class PackagesController extends Controller
                 $config = [
                     'sources' => Yii::getAlias($bundle->devPath),
                     'dist' => Yii::getAlias($bundle->distPath),
+                    'module' => $module,
                 ];
                 if ($bundle->scssPath !== null) {
                     $config['scssPath'] = $bundle->scssPath;
-                    $ret['cssfiles'][] = [
+                    $config['cssfiles'][] = [
                         'sources' => $config['sources'] . DIRECTORY_SEPARATOR . $config['scssPath'],
                         'dev' => $config['sources'] . DIRECTORY_SEPARATOR . 'css', /** @todo hardcoded */
                         'dist' => $config['dist'] . DIRECTORY_SEPARATOR . 'css',
@@ -109,7 +134,7 @@ class PackagesController extends Controller
                             $fullpaths[] = $config['sources'] . DIRECTORY_SEPARATOR . $script;
                         }
                         $destPath = $config['dist'] . DIRECTORY_SEPARATOR . $name;
-                        $ret['jsfiles'][] = [
+                        $config['jsfiles'][] = [
                             'sources' => $fullpaths,
                             'dist' => $destPath,
                         ];
