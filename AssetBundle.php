@@ -63,7 +63,7 @@ class AssetBundle extends \yii\web\AssetBundle
     public function init()
     {
         if (YII_DEBUG) {
-            $this->js = array();
+            $this->js = [];
             foreach ($this->devJs as $name => $scripts) {
                 if (is_array($scripts)) {
                     $this->js = array_merge($this->js, $scripts);

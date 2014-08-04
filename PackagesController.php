@@ -63,7 +63,7 @@ class PackagesController extends Controller
                 } elseif (!empty($config['class'])) {
                     try {
                         $class = new \ReflectionClass($config['class']);
-                    } catch(\ReflectionException $e) {
+                    } catch (\ReflectionException $e) {
                         continue;
                     }
                     $path = dirname($class->getFileName());
