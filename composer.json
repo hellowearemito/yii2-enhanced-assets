@@ -10,9 +10,6 @@
             "email": "n.kovacs@mito.hu"
         }
     ],
-    "require": {
-        "yiisoft/yii2": "*"
-    },
     "autoload": {
         "psr-4": {
             "mito\\assets\\": ""
