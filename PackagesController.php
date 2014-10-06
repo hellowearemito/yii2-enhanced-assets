@@ -116,10 +116,17 @@ class PackagesController extends Controller
                     'dist' => Yii::getAlias($bundle->distPath),
                     'module' => $module,
                 ];
+                $cssSourcePaths = [];
                 if ($bundle->scssPath !== null) {
                     $config['scssPath'] = $bundle->scssPath;
+                    $cssSourcePaths = [$bundle->scssPath];
+                }
+                if (is_array($bundle->cssSourcePaths)) {
+                    $cssSourcePaths = array_unique(array_merge($cssSourcePaths, $bundle->cssSourcePaths));
+                }
+                if (count($cssSourcePaths)) {
                     $config['cssfiles'][] = [
-                        'sources' => $config['sources'] . DIRECTORY_SEPARATOR . $config['scssPath'],
+                        'sources' => $cssSourcePaths,
                         'dev' => $config['sources'] . DIRECTORY_SEPARATOR . 'css', /** @todo hardcoded */
                         'dist' => $config['dist'] . DIRECTORY_SEPARATOR . 'css',
                     ];

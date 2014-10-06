@@ -53,8 +53,16 @@ class AssetBundle extends \yii\web\AssetBundle
      * @var string relative path to scss files
      *
      * files in this directory will be compiled to css files in the css directory
+     * @deprecated use $cssSourcePaths instead
      */
     public $scssPath = null;
+
+    /**
+     * @var array relative paths to css source files (scss, less etc.)
+     *
+     * files in these directory will be compiled to css files in the css directory
+     */
+    public $cssSourcePaths = [];
 
 
     /**
