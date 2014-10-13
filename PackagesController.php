@@ -2,9 +2,9 @@
 
 namespace mito\assets;
 
+use Yii;
 use yii\console\Controller;
 use yii\helpers\Json;
-use \Yii;
 
 /**
  * This command returns information about asset bundles for grunt.
@@ -15,6 +15,17 @@ class PackagesController extends Controller
      * @var path to main config file
      */
     public $configPath;
+
+    /**
+     * @inheritdoc
+     */
+    public function options($actionID)
+    {
+        return array_merge(
+            parent::options($actionID),
+            ['configPath'] // global for all actions
+        );
+    }
 
     /**
      * Loads the config file
