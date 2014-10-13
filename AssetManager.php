@@ -190,7 +190,7 @@ class AssetManager extends \yii\web\AssetManager
             $versions = array_slice($versions, $keep);
             foreach ($versions as $version => $time) {
                 if (!is_link($version) && is_dir($version)) {
-                    CFileHelper::removeDirectory($version);
+                    FileHelper::removeDirectory($version);
                 } else {
                     @unlink($version);
                 }
