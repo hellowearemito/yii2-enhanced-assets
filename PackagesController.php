@@ -20,7 +20,12 @@ class PackagesController extends Controller
     /**
      * @var array names of bundles to always check when deploying
      */
-    public $deployBundles = [
+    public $deployBundles = [];
+
+    /**
+     * @var array names of default bundles, will be merged into $deployBundles
+     */
+    public $defaultBundles = [
         'yii\validators\ValidationAsset',
         'yii\validators\PunycodeAsset',
         'yii\widgets\MaskedInputAsset',
@@ -132,7 +137,11 @@ class PackagesController extends Controller
         if (isset($bundles[$bundleName])) {
             return;
         }
-        $bundle = Yii::createObject($bundleName);
+        try {
+            $bundle = Yii::createObject($bundleName);
+        } catch (\Exception $x) {
+            return;
+        }
 
         $bundles[$bundleName] = $bundle;
 
@@ -164,7 +173,7 @@ class PackagesController extends Controller
             }
         }
 
-        foreach ($this->deployBundles as $bundleName) {
+        foreach (array_merge($this->deployBundles, $this->defaultBundles) as $bundleName) {
             $this->collectBundle($bundleName, $bundles);
         }
 
@@ -192,7 +201,6 @@ class PackagesController extends Controller
             }
 
             foreach ($files as $file) {
-                echo "Checking $directory/$file\n";
                 $time = @filemtime($directory . '/' . $file);
                 if ($time === false) {
                     continue;
