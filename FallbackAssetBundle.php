@@ -39,7 +39,7 @@ class FallbackAssetBundle extends AssetBundle
                 }
             }
 
-            $position = isset($fallback->jsOptions['position']) ? $fallback->jsOptions['position'] : View::POS_END;
+            $position = isset($this->jsOptions['position']) ? $this->jsOptions['position'] : View::POS_END;
             $view->jsFiles[$position][] = Html::script(
                 $this->check." || document.write(" . Json::encode($scripts) . ");",
                 ['type' => 'text/javascript']
