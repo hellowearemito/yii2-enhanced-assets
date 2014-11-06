@@ -3,6 +3,7 @@
 namespace mito\assets;
 
 use mito\assets\AssetBundle;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
 use yii\web\View;
@@ -29,17 +30,54 @@ class FallbackAssetBundle extends AssetBundle
     {
         parent::registerAssetFiles($view);
         if ($this->fallback !== null && $this->check !== null) {
-            $fallback = $view->getAssetManager()->getBundle($this->fallback);
+            $am = $view->getAssetManager();
+            $fallback = $am->getBundle($this->fallback);
             $scripts = '';
+            $jsOptions = $fallback->jsOptions;
+            $cssOptions = $fallback->cssOptions;
+            unset($jsOptions['depends']);
+            unset($cssOptions['depends']);
+            unset($cssOptions['condition']);
+            unset($cssOptions['noscript']);
+            if (!isset($cssOptions['rel'])) {
+                $cssOptions['rel'] = 'stylesheet';
+            }
             foreach ($fallback->js as $js) {
-                if (strpos($js, '/') !== 0 && strpos($js, '://') === false) {
-                    $scripts .= Html::jsFile($fallback->baseUrl . '/' . $js, [], $fallback->jsOptions);
-                } else {
-                    $scripts .= Html::jsFile($js, [], $fallback->jsOptions);
-                }
+                $scripts .= Html::jsFile($am->getAssetUrl($fallback, $js), $fallback->jsOptions);
+            }
+
+            $styles = [];
+            foreach ($fallback->css as $css) {
+                $styles[] = [
+                    'file' => $am->getAssetUrl($fallback, $css),
+                    'options' => $cssOptions,
+                ];
             }
 
             $position = isset($this->jsOptions['position']) ? $this->jsOptions['position'] : View::POS_END;
+
+            if (count($styles)) {
+                $view->jsFiles[$position][] = Html::script(
+                    "
+                        (function() {
+                            if (!{$this->check}) {
+                                var files = " . Json::encode($styles) . ";
+
+                                for (var i = 0, l = files.length; i < l; i++) {
+                                    var tag = document.createElement('link');
+                                    for (var opt in files[i].options) {
+                                        tag[opt] = files[i].options[opt];
+                                    }
+                                    tag.href = files[i].file;
+                                    document.head.appendChild(tag);
+                                }
+                            }
+                        })();
+                    ",
+                    ['type' => 'text/javascript']
+                );
+            }
+
             $view->jsFiles[$position][] = Html::script(
                 $this->check." || document.write(" . Json::encode($scripts) . ");",
                 ['type' => 'text/javascript']
