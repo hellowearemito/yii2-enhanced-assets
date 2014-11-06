@@ -24,6 +24,11 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public $devJs = [];
     /**
+     * @var array|null list of development css files
+     * If this is not null, it will overwrite $css
+     */
+    public $devCss = null;
+    /**
      * @var string the base directory for development assets
      *
      * You can use either a directory or an alias of the directory.
@@ -78,6 +83,9 @@ class AssetBundle extends \yii\web\AssetBundle
                 } else {
                     $this->js[] = $scripts;
                 }
+            }
+            if ($this->devCss !== null) {
+                $this->css = $this->devCss;
             }
             if ($this->devPath !== null) {
                 $this->sourcePath = $this->devPath;
