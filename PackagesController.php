@@ -4,6 +4,7 @@ namespace mito\assets;
 
 use Yii;
 use yii\console\Controller;
+use yii\helpers\FileHelper;
 use yii\helpers\Json;
 use yii\helpers\Url;
 
@@ -190,7 +191,22 @@ class PackagesController extends Controller
 
             foreach (array_merge($bundle->js, $bundle->css) as $file) {
                 if (Url::isRelative($file)) {
-                    $files[] = $file;
+                    $files[] = $directory . DIRECTORY_SEPARATOR . $file;
+                }
+            }
+
+            if ($bundle instanceof AssetBundle) {
+                if ($bundle->imgPath !== null) {
+                    $dir = $directory . DIRECTORY_SEPARATOR . $bundle->imgPath;
+                    if (is_dir($dir)) {
+                        $files = array_merge($files, FileHelper::findFiles($dir));
+                    }
+                }
+                if ($bundle->fontPath !== null) {
+                    $dir = $directory . DIRECTORY_SEPARATOR . $bundle->fontPath;
+                    if (is_dir($dir)) {
+                        $files = array_merge($files, FileHelper::findFiles($dir));
+                    }
                 }
             }
 
@@ -201,7 +217,7 @@ class PackagesController extends Controller
             }
 
             foreach ($files as $file) {
-                $time = @filemtime($directory . '/' . $file);
+                $time = @filemtime($file);
                 if ($time === false) {
                     continue;
                 }
