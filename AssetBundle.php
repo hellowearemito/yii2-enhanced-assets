@@ -10,6 +10,7 @@ class AssetBundle extends \yii\web\AssetBundle
 {
     /**
      * @var array list of development js files
+     * If this is not null, it will overwrite $js
      * If an element is an array, the javascript files in that array
      * will be compiled to the javascript file specified in the element's key
      *
@@ -22,7 +23,7 @@ class AssetBundle extends \yii\web\AssetBundle
      * ```
      *
      */
-    public $devJs = [];
+    public $devJs = null;
     /**
      * @var array|null list of development css files
      * If this is not null, it will overwrite $css
@@ -76,12 +77,14 @@ class AssetBundle extends \yii\web\AssetBundle
     public function init()
     {
         if (YII_DEBUG) {
-            $this->js = [];
-            foreach ($this->devJs as $name => $scripts) {
-                if (is_array($scripts)) {
-                    $this->js = array_merge($this->js, $scripts);
-                } else {
-                    $this->js[] = $scripts;
+            if ($this->devJs !== null) {
+                $this->js = [];
+                foreach ($this->devJs as $name => $scripts) {
+                    if (is_array($scripts)) {
+                        $this->js = array_merge($this->js, $scripts);
+                    } else {
+                        $this->js[] = $scripts;
+                    }
                 }
             }
             if ($this->devCss !== null) {
