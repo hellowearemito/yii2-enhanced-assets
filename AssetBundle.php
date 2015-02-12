@@ -70,6 +70,11 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public $cssSourcePaths = [];
 
+    /**
+     * @var array|null extra parameters to pass to gulp.
+     */
+    public $extraParams;
+
 
     /**
      * {@inheritdoc}
