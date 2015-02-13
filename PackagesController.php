@@ -305,6 +305,7 @@ class PackagesController extends Controller
                 if ($bundle->extraParams !== null) {
                     $config['extraParams'] = $bundle->extraParams;
                 }
+                $config['package'] = $bundle::className();
                 $ret['packages'][] = $config;
             }
         }
