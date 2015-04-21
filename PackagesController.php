@@ -181,15 +181,19 @@ class PackagesController extends Controller
         foreach ($bundles as $bundle) {
             if ($bundle instanceof AssetBundle && $bundle->distPath !== null) {
                 $directory = Yii::getAlias($bundle->distPath);
+                $jsFiles = $bundle->getDistJs();
+                $cssFiles = $bundle->getDistCss();
             } elseif ($bundle->sourcePath !== null) {
                 $directory = Yii::getAlias($bundle->sourcePath);
+                $jsFiles = $bundle->js;
+                $cssFiles = $bundle->css;
             } else {
                 continue;
             }
 
             $files = [];
 
-            foreach (array_merge($bundle->js, $bundle->css) as $file) {
+            foreach (array_merge($jsFiles, $cssFiles) as $file) {
                 if (Url::isRelative($file)) {
                     $files[] = $directory . DIRECTORY_SEPARATOR . $file;
                 }

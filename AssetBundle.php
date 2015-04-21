@@ -75,6 +75,9 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public $extraParams;
 
+    private $_distJs = [];
+
+    private $_distCss = [];
 
     /**
      * {@inheritdoc}
@@ -83,6 +86,7 @@ class AssetBundle extends \yii\web\AssetBundle
     {
         if (YII_DEBUG) {
             if ($this->devJs !== null) {
+                $this->_distJs = $this->js;
                 $this->js = [];
                 foreach ($this->devJs as $name => $scripts) {
                     if (is_array($scripts)) {
@@ -93,6 +97,7 @@ class AssetBundle extends \yii\web\AssetBundle
                 }
             }
             if ($this->devCss !== null) {
+                $this->_distCss = $this->css;
                 $this->css = $this->devCss;
             }
             if ($this->devPath !== null) {
@@ -104,5 +109,29 @@ class AssetBundle extends \yii\web\AssetBundle
             }
         }
         parent::init();
+    }
+
+    /**
+     * Returns production js files, even if the environment is in debug mode (YII_DEBUG is true)
+     * @return array js files
+     */
+    public function getDistJs()
+    {
+        if (YII_DEBUG) {
+            return $this->_distJs;
+        }
+        return $this->js;
+    }
+
+    /**
+     * Returns production css files, even if the environment is in debug mode (YII_DEBUG is true)
+     * @return array css files
+     */
+    public function getDistCss()
+    {
+        if (YII_DEBUG) {
+            return $this->_distCss;
+        }
+        return $this->css;
     }
 }
