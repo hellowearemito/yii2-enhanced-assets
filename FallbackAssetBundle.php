@@ -61,7 +61,7 @@ class FallbackAssetBundle extends AssetBundle
                     "
                         (function() {
                             if (!{$this->check}) {
-                                var files = " . Json::encode($styles, 0) . ";
+                                var files = " . Json::htmlEncode($styles, 0) . ";
 
                                 for (var i = 0, l = files.length; i < l; i++) {
                                     var tag = document.createElement('link');
@@ -79,7 +79,7 @@ class FallbackAssetBundle extends AssetBundle
             }
 
             $view->jsFiles[$position][] = Html::script(
-                $this->check." || document.write(" . Json::encode($scripts, 0) . ");",
+                $this->check." || document.write(" . Json::htmlEncode($scripts, 0) . ");",
                 ['type' => 'text/javascript']
             );
         }
