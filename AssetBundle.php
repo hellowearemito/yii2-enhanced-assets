@@ -85,8 +85,8 @@ class AssetBundle extends \yii\web\AssetBundle
     public function init()
     {
         if (YII_DEBUG) {
+            $this->_distJs = $this->js;
             if ($this->devJs !== null) {
-                $this->_distJs = $this->js;
                 $this->js = [];
                 foreach ($this->devJs as $name => $scripts) {
                     if (is_array($scripts)) {
@@ -96,8 +96,8 @@ class AssetBundle extends \yii\web\AssetBundle
                     }
                 }
             }
+            $this->_distCss = $this->css;
             if ($this->devCss !== null) {
-                $this->_distCss = $this->css;
                 $this->css = $this->devCss;
             }
             if ($this->devPath !== null) {
