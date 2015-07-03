@@ -78,26 +78,28 @@ class BundleManager extends \yii\base\Component
         }
 
         foreach ($modules as $name => $config) {
+            $className = null;
+            $path = false;
             if (is_array($config)) {
                 if (!empty($config['basePath'])) {
                     $path = realpath(Yii::getAlias($config['basePath']));
-                    if ($path === false) {
-                        continue;
-                    }
                 } elseif (!empty($config['class'])) {
-                    try {
-                        $class = new \ReflectionClass($config['class']);
-                    } catch (\ReflectionException $e) {
-                        continue;
-                    }
-                    $path = dirname($class->getFileName());
-                    if ($path === false) {
-                        continue;
-                    }
-                } else {
-                    continue;
+                    $className = $config['class'];
                 }
             } else {
+                $className = $config;
+            }
+
+            if ($className !== null) {
+                try {
+                    $class = new \ReflectionClass($className);
+                } catch (\ReflectionException $e) {
+                    continue;
+                }
+                $path = dirname($class->getFileName());
+            }
+
+            if ($path === false) {
                 continue;
             }
 
