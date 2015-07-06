@@ -50,6 +50,19 @@ class BundleManager extends \yii\base\Component
         return require($configPath);
     }
 
+    protected function collectModuleConfigs($configs, &$modules, $prefix = '')
+    {
+        foreach ($configs as $name => $config) {
+            $modules[] = [
+                'name' => $prefix . $name,
+                'config' => $config,
+            ];
+            if (is_array($config) && !empty($config['modules'])) {
+                $this->collectModuleConfigs($config['modules'], $modules, $prefix . $name . '/');
+            }
+        }
+    }
+
     /**
      * Return paths to assets.
      * @return array
@@ -64,22 +77,19 @@ class BundleManager extends \yii\base\Component
         ]];
 
 
-        /** @todo: module classes are namespaced class names, not path aliases */
         if (empty($mainConfig['modules'])) {
             return $paths;
         }
-        $modules = $mainConfig['modules'];
+        $moduleConfig = $mainConfig['modules'];
 
-        foreach ($modules as $config) {
-            // merge submodules
-            if (is_array($config) && !empty($config['modules'])) {
-                $modules = $modules + $config['modules'];
-            }
-        }
+        $modules = [];
+        $this->collectModuleConfigs($moduleConfig, $modules);
 
-        foreach ($modules as $name => $config) {
+        foreach ($modules as $module) {
             $className = null;
             $path = false;
+            $name = $module['name'];
+            $config = $module['config'];
             if (is_array($config)) {
                 if (!empty($config['basePath'])) {
                     $path = realpath(Yii::getAlias($config['basePath']));
