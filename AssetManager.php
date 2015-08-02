@@ -11,6 +11,11 @@ use \yii\helpers\FileHelper;
  */
 class AssetManager extends \yii\web\AssetManager
 {
+    protected function hash($path)
+    {
+        return sprintf('%x', crc32($path . Yii::getVersion()));
+    }
+
     protected function hash2($dir, $time)
     {
         return [$this->hash($dir), $this->hash($time)];
