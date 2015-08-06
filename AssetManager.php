@@ -20,12 +20,12 @@ class AssetManager extends \yii\web\AssetManager
         $path = is_file($path) ? dirname($path) : $path;
         // use /, not DIRECTORY_SEPARATOR, because this is used in urls too,
         // and / works everywhere as a directory separator
-        $pathHash = sprintf('%x', crc32($path . Yii::getVersion()));
+        $pathHash = sprintf('%x', crc32($path));
         $baseDir = $this->basePath . DIRECTORY_SEPARATOR . $pathHash;
         if (!is_dir($baseDir)) {
             FileHelper::createDirectory($baseDir, $this->dirMode, true);
         }
-        return sprintf('%s/%x', $pathHash, crc32($time));
+        return sprintf('%s/%x', $pathHash, crc32(Yii::getVersion() . $time));
     }
 
     /**
