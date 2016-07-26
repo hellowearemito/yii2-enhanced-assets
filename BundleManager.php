@@ -311,6 +311,9 @@ class BundleManager extends \yii\base\Component
                 if ($bundle->extraParams !== null) {
                     $config['extraParams'] = $bundle->extraParams;
                 }
+                if (is_array($bundle->otherPaths)) {
+                    $config['otherpaths'] = $bundle->otherPaths;
+                }
                 $config['package'] = $bundle::className();
                 $ret['packages'][] = $config;
             }

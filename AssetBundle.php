@@ -56,6 +56,10 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public $fontPath = null;
     /**
+     * @var array list of paths (relative to base directory) to copy from development directory to production directory on build
+     */
+    public $otherPaths = [];
+    /**
      * @var string relative path to scss files
      *
      * files in this directory will be compiled to css files in the css directory
