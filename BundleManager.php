@@ -314,6 +314,7 @@ class BundleManager extends \yii\base\Component
                 if (is_array($bundle->otherPaths)) {
                     $config['otherpaths'] = $bundle->otherPaths;
                 }
+                $config['transpiledjs'] = $bundle->transpiledJsPath;
                 $config['package'] = $bundle::className();
                 $ret['packages'][] = $config;
             }

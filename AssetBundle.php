@@ -25,6 +25,16 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public $devJs = null;
     /**
+     * @var string|null relative path to transpiled js files
+     *
+     * If this is not null, js files in devJs will be transpiled
+     * into this directory and the asset bundle will load the transpiled
+     * files instead of the source files in devJs.
+     * The directory structure will be kept, e.g.
+     * js/file1.js will be transpiled into $transpiledJsPath/js/file1.js.
+     */
+    public $transpiledJsPath = null;
+    /**
      * @var array|null list of development css files
      * If this is not null, it will overwrite $css
      */
@@ -84,6 +94,29 @@ class AssetBundle extends \yii\web\AssetBundle
     private $_distCss = [];
 
     /**
+     * Map development js files to their
+     * transpiled versions by appending $transpiledJsPath.
+     *
+     * @param string|array $scripts js file paths
+     *
+     * @return string|array transpiled js file paths
+     */
+    protected function mapTranspiled($scripts)
+    {
+        if (!$this->transpiledJsPath) {
+            return $scripts;
+        }
+        if (is_array($scripts)) {
+            foreach ($scripts as &$script) {
+                $script = $this->transpiledJsPath . '/' . $script;
+            }
+        } else {
+            $scripts = $this->transpiledJsPath . '/' . $scripts;
+        }
+        return $scripts;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function init()
@@ -93,6 +126,7 @@ class AssetBundle extends \yii\web\AssetBundle
             if ($this->devJs !== null) {
                 $this->js = [];
                 foreach ($this->devJs as $name => $scripts) {
+                    $scripts = $this->mapTranspiled($scripts);
                     if (is_array($scripts)) {
                         $this->js = array_merge($this->js, $scripts);
                     } else {
