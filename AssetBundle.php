@@ -79,6 +79,13 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public $extraParams;
 
+    /**
+     * @var string|boolean|null
+     * If this is true, it will be overridden by devPath or distPath.
+     * If it is null, it won't, so that a dummy bundle can still be created from this bundle.
+     */
+    public $sourcePath = true;
+
     private $_distJs = [];
 
     private $_distCss = [];
@@ -88,28 +95,30 @@ class AssetBundle extends \yii\web\AssetBundle
      */
     public function init()
     {
-        if (YII_DEBUG) {
-            $this->_distJs = $this->js;
-            if ($this->devJs !== null) {
-                $this->js = [];
-                foreach ($this->devJs as $name => $scripts) {
-                    if (is_array($scripts)) {
-                        $this->js = array_merge($this->js, $scripts);
-                    } else {
-                        $this->js[] = $scripts;
+        if ($this->sourcePath === true) {
+            if (YII_DEBUG) {
+                $this->_distJs = $this->js;
+                if ($this->devJs !== null) {
+                    $this->js = [];
+                    foreach ($this->devJs as $name => $scripts) {
+                        if (is_array($scripts)) {
+                            $this->js = array_merge($this->js, $scripts);
+                        } else {
+                            $this->js[] = $scripts;
+                        }
                     }
                 }
-            }
-            $this->_distCss = $this->css;
-            if ($this->devCss !== null) {
-                $this->css = $this->devCss;
-            }
-            if ($this->devPath !== null) {
-                $this->sourcePath = $this->devPath;
-            }
-        } else {
-            if ($this->distPath !== null) {
-                $this->sourcePath = $this->distPath;
+                $this->_distCss = $this->css;
+                if ($this->devCss !== null) {
+                    $this->css = $this->devCss;
+                }
+                if ($this->devPath !== null) {
+                    $this->sourcePath = $this->devPath;
+                }
+            } else {
+                if ($this->distPath !== null) {
+                    $this->sourcePath = $this->distPath;
+                }
             }
         }
         parent::init();
